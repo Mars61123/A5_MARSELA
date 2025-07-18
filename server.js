@@ -1,19 +1,33 @@
-const HTTP_PORT = process.env.PORT || 8080;
+/********************************************************************************
+* WEB322 – Assignment 05
+*
+* I declare that this assignment is my own work and completed based on my
+* current understanding of the course concepts.
+*
+* The assignment was completed in accordance with:
+* a. The Seneca's Academic Integrity Policy
+* https://www.senecacollege.ca/about/policies/academic-integrity-policy.html
+*
+* b. The academic integrity policies noted in the assessment description
+*
+* I did NOT use generative AI tools (ChatGPT, Copilot, etc) to produce the code
+* for this assessment.
+*
+* Name: Marsela Gjeka Student ID: 153019237
+*
+********************************************************************************/
+const APP_PORT = process.env.PORT || 8080;
 
-const express = require("express");
-const app = express();
-app.use(express.static("public"));  
-app.set("view engine", "ejs");      // ejs
-app.use(express.urlencoded({ extended: true })); // forms
+const expressLib = require("express");
+const server = expressLib();
+server.use(expressLib.static("public"));
+server.set("view engine", "ejs");
+server.use(expressLib.urlencoded({ extended: true }));
 
 require("dotenv").config();
-// Vercel required code
-app.set("views", __dirname + "/views");
-require("pg");
-
-// +++ Database connection code
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize(
+// +++ ORM setup
+const { Sequelize: Orm, DataTypes: FieldTypes } = require("sequelize");
+const db = new Orm(
   process.env.PGDATABASE,
   process.env.PGUSER,
   process.env.PGPASSWORD,
@@ -21,21 +35,19 @@ const sequelize = new Sequelize(
     host: process.env.PGHOST,
     dialect: "postgres",
     port: 5432,
-    dialectOptions: {
-      ssl: { rejectUnauthorized: false },
-    },
+    dialectOptions: { ssl: { rejectUnauthorized: false } },
   }
 );
 
-// +++ 4. Define your database table
-const Location = sequelize.define(
+// +++ Define your model (kept table named "Location")
+const Memory = db.define(
   "Location",
   {
-    name: DataTypes.TEXT,
-    address: DataTypes.TEXT,
-    category: DataTypes.TEXT,
-    comments: DataTypes.TEXT,
-    image: DataTypes.TEXT,
+    name: FieldTypes.TEXT,
+    address: FieldTypes.TEXT,
+    category: FieldTypes.TEXT,
+    comments: FieldTypes.TEXT,
+    image: FieldTypes.TEXT,
   },
   {
     createdAt: false,
@@ -43,72 +55,54 @@ const Location = sequelize.define(
   }
 );
 
-// +++ 5. Define your server routes
-app.get("/", async (req, res) => {
+// +++ Routes
+server.get("/", async (req, res) => {
   try {
-    const locations = await Location.findAll();
-    res.render("home.ejs", { locations });
-  } catch (err) {
+    const allEntries = await Memory.findAll();
+    res.render("home.ejs", { locations: allEntries });
+  } catch (error) {
     res.status(500).send("Error loading locations.");
   }
 });
 
-app.get("/memories/add", (req, res) => {
+server.get("/memories/add", (req, res) => {
   res.render("add.ejs");
 });
 
-
-// POST route to add a new memory
-app.post("/memories/add", async (req, res) => {
+server.post("/memories/add", async (req, res) => {
   const { name, address, category, comments, image } = req.body;
-
+  
   try {
-    await Location.create({
-      name,
-      address,
-      category,
-      comments,
-      image,
-    });
-
+    await Memory.create({ name, address, category, comments, image });
     res.redirect("/");
-  } catch (err) {
+  } catch (error) {
     res.status(500).send("Error saving location.");
   }
 });
 
-// GET route to delete a memory by id
-app.get("/memories/delete/:id", async (req, res) => {
-  const locationId = req.params.id;
-
+server.get("/memories/delete/:id", async (req, res) => {
+  const entryId = req.params.id;
   try {
-    await Location.destroy({
-      where: { id: locationId },
-    });
-
+    await Memory.destroy({ where: { id: entryId } });
     res.redirect("/");
-  } catch (err) {
+  } catch (error) {
     res.status(500).send("Error deleting location.");
   }
 });
 
-// +++  Function to start server
-async function startServer() {
+// +++ Server start-up
+async function initServer() {
   try {
-    await sequelize.authenticate();
-    await sequelize.sync();
+    await db.authenticate();
+    await db.sync();
 
-    console.log("SUCCESS connecting to database");
-    console.log("STARTING Express web server");
+    console.log("✔️  Database connected!");
+    console.log(`🚀  Server listening on http://localhost:${APP_PORT}`);
 
-    app.listen(HTTP_PORT, () => {
-      console.log(`server listening on: http://localhost:${HTTP_PORT}`);
-    });
+    server.listen(APP_PORT);
   } catch (err) {
-    console.log("ERROR: connecting to database");
-    console.log(err);
-    console.log("Please resolve these errors and try again.");
+    console.error("❌  Failed to start:", err);
   }
 }
 
-startServer();
+initServer();
