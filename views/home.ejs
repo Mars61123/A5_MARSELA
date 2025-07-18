@@ -1,16 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/css/main.css"/>
+  <meta charset="UTF-8">
+  <title>NYC Memories</title>
+  <link rel="stylesheet" href="/css/home.css">
 </head>
-
 <body>
-    <h1>Home Page goes here</h1>
-    <a href="/memories/add">Link to Add Page</a>
-</body>
 
+  <!-- Hero with background image -->
+  <div class="hero min-h-screen" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401');">
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-neutral-content text-center">
+      <div class="max-w-lg">
+        <h1 class="mb-5 text-5xl font-bold">New York City</h1>
+        <p class="mb-5">Explore your favorite memories in the city that never sleeps!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto my-6 gap-x-8">
+    <!-- add button -->
+    <div class="flex justify-end mb-4">
+      <a href="/memories/add" class="btn btn-active btn-primary">Add Location</a>
+    </div>
+
+    <!-- table -->
+    <div>
+      <table class="table">
+        <thead>
+          <tr class="bg-neutral-content">
+            <th></th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Comments</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% locations.forEach(location => { %>
+            <tr>
+              <td>
+                <img src="<%= location.image %>" class="w-96" />
+              </td>
+              <td>
+                <span class="font-bold"><%= location.name %></span><br />
+                <span class="badge badge-primary badge-sm badge-outline"><%= location.category %></span>
+              </td>
+              <td><%= location.address %></td>
+              <td><%= location.comments %></td>
+              <td>
+                <a href="/memories/delete/<%= location.id %>" class="btn btn-default btn-xs">Delete</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
 </html>

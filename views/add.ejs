@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add</title>
-    <link rel="stylesheet" href="/css/main.css"/>
+  <meta charset="UTF-8">
+  <title>Add Location</title>
+  <link rel="stylesheet" href="/css/add.css">
 </head>
-
 <body>
-    <h1>Add Page Goes Here</h1>
-</body>
+  <div class="w-full">
 
+    <!-- hero with background image -->
+    <div class="hero bg-base-200">
+      <div class="hero-content text-center">
+        <div class="max-w-md">
+          <h1 class="text-4xl font-bold">Add a Location</h1>
+          <p class="py-6">Add a location to remember.</p>
+        </div>
+      </div>
+    </div> <!-- end hero -->
+
+    <div class="container mx-auto max-w-sm mt-4">
+      <form action="/memories/add" method="POST" class="px-8 pt-6 pb-8 flex flex-col">
+        <input type="text" name="name" placeholder="Enter location name" class="input input-bordered w-full max-w-xs mb-4" required>
+        <input type="text" name="address" placeholder="Enter location address" class="input input-bordered w-full max-w-xs mb-4" required>
+        <select name="category" class="select select-bordered w-full max-w-xs mb-4" required>
+          <option value="Food">Food</option>
+          <option value="Outdoors">Outdoors</option>
+          <option value="Events">Events</option>
+        </select>
+        <input type="text" name="image" placeholder="Enter image url" class="input input-bordered w-full max-w-xs mb-4" required>
+        <textarea name="comments" class="textarea textarea-bordered mb-4" placeholder="What are your memories of this place?" required></textarea>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</body>
 </html>

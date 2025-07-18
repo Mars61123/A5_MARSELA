@@ -57,6 +57,41 @@ app.get("/memories/add", (req, res) => {
   res.render("add.ejs");
 });
 
+
+// POST route to add a new memory
+app.post("/memories/add", async (req, res) => {
+  const { name, address, category, comments, image } = req.body;
+
+  try {
+    await Location.create({
+      name,
+      address,
+      category,
+      comments,
+      image,
+    });
+
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send("Error saving location.");
+  }
+});
+
+// GET route to delete a memory by id
+app.get("/memories/delete/:id", async (req, res) => {
+  const locationId = req.params.id;
+
+  try {
+    await Location.destroy({
+      where: { id: locationId },
+    });
+
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send("Error deleting location.");
+  }
+});
+
 // +++  Function to start server
 async function startServer() {
   try {
